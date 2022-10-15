@@ -15,7 +15,7 @@ export default {
   position: fixed;
   display: flex;
   height: 49px;
-  padding-top: 5px;
+  padding: 5px 0;
   left: 0;
   right: 0;
   bottom: 0;
@@ -25,6 +25,7 @@ export default {
 .tab-bar-item {
   flex: 1;
   text-align: center;
+  font-size: 15px;
 }
 .tab-bar-item img{
   width: 20px;
