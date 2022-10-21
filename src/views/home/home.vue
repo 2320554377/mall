@@ -5,88 +5,21 @@
             <span>购物街</span>
         </template>
     </nav-bar>
-    <scroll :imgArr="banner" class="scrollUse"></scroll>
-    <recommend-view :features="recommend"></recommend-view>
-    <featureView></featureView>
-    <tabControl :tabTitle="['流行', '新款', '精选']" class="tabControlUse" @tabControlClick="switchList"></tabControl>
-    <goods-list :goodsList="goods[currentList].list"></goods-list>
-    
-    <ul>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li><li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-      <li>foo</li>
-    </ul>
+    <!-- <b-scroll> -->
+      <scroll :imgArr="banner" class="scrollUse"></scroll>
+      <recommend-view :features="recommend"></recommend-view>
+      <feature-view></feature-view>
+      <tabControl :tabTitle="['流行', '新款', '精选']" class="tabControlUse" @tabControlClick="switchList"></tabControl>
+      <goods-list 
+      :goodsList="goods[currentList].list"
+      :goodsScroll="goods[currentList].scrollPx"
+      :isClicked="goods.isClicked"
+      @scrollPosChanged="setScrollPos"
+      >
+      </goods-list>
+    <!-- </b-scroll> -->
+    <Pull-for-more @askForMore="forHomeGoods(currentList)"></Pull-for-more>
+     <back-top></back-top>
   </div>
 </template>
 
@@ -95,6 +28,9 @@ import navBar from '@/components/common/navbar/navBar.vue'
 import scroll from '@/components/common/scroll/scroll.vue'
 import tabControl from '@/components/common/tabControl/tabControl.vue'
 import goodsList from '@/components/common/goodsList/goodsList.vue'
+import backTop from '@/components/common/backTop/backTop.vue'
+import PullForMore from '@/components/common/pullForMore/pullForMore.vue'
+// import BScroll from '@/components/common/betterScroll/BScroll.vue'
 
 import recommendView from '@/views/home/childCpns/recommendView.vue'
 import featureView from '@/views/home/childCpns/featureView.vue'
@@ -110,29 +46,39 @@ export default {
         goods: {
           pop: {
             page: 1,
-            list:[]
+            list:[],
+            scrollPx: 0
           },
           new: {
             page: 1,
-            list: []
+            list: [],
+            scrollPx: 0
           },
           sell: {
             page: 1,
-            list: []
-          }
+            list: [],
+            scrollPx: 0
+          },
+          isClicked: 0,
+          
         },
-        currentList: 'pop'
+        currentList: 'pop',
       }
     },
     components: {
-        navBar,
-        scroll,
-        recommendView,
-        featureView,
-        tabControl,
-        goodsList
-    },
+    navBar,
+    scroll,
+    recommendView,
+    featureView,
+    tabControl,
+    goodsList,
+    backTop,
+    PullForMore
+    // BScroll
+
+},
     created(){
+      //申请数据
       this.forHomeMultidata();
       this.forHomeGoods('pop');
       this.forHomeGoods('new');
@@ -153,7 +99,6 @@ export default {
         getHomeGoods(type, page)
         .then(res => {
           this.goods[type].list.push(...res.data.data.list);
-          console.log(this.goods[type].list);
           this.goods[type].page++;
         })
         .catch(err => console.log(err))
@@ -170,6 +115,11 @@ export default {
             this.currentList = 'sell'
             break;
         }
+        //通过毫秒数来实现参数变化，以便goodsList中监听
+        this.goods.isClicked = Date.now();
+      },
+      setScrollPos(scrollpos){
+        this.goods[this.currentList].scrollPx = scrollpos
       }
     }
 }
@@ -186,5 +136,8 @@ export default {
 .tabControlUse{
   position: sticky;
   top: 44px;
+}
+*::-webkit-scrollbar{
+  display: none;
 }
 </style>

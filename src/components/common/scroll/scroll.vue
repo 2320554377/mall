@@ -138,12 +138,20 @@ export default {
         }
     },
     mounted: function () {
+        for(let i = 0;i < 100;i++){
+            window.clearInterval(i)
+        }
       setTimeout(() => {
         this.handleDom();
         if(this.timer === null){
             this.setTimer();
         }
-      }, 1000)
+      },300)
+    },
+    deactivated(){
+        for(let i = 0;i < 100;i++){
+            window.clearInterval(i)
+        }
     },
     components: {
         scrollItem
